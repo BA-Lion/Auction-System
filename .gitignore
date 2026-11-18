@@ -1,0 +1,54 @@
+.ai/
+# Operating system files
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Local IDE and editor files
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Local environment variables and configuration secrets
+.env
+.env.*
+!.env.example
+!.env.*.example
+
+# Dependencies and virtual environments
+node_modules/
+.venv/
+venv/
+
+# Build output and caches
+dist/
+build/
+target/
+out/
+.cache/
+.next/
+.nuxt/
+.output/
+.turbo/
+__pycache__/
+*.py[cod]
+
+# Test coverage and reports
+coverage/
+.nyc_output/
+test-results/
+playwright-report/
+
+# Logs and temporary files
+logs/
+*.log
+*.tmp
+*.temp
+
+# Local certificates and private keys
+*.key
+*.pem
+*.p12
+*.pfx
