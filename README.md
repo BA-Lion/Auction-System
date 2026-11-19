@@ -22,11 +22,25 @@ npm start
 
 `npm test` 使用隔离数据和可控时钟验证 HTTP 与 WebSocket 流程。Demo 用单个 Node.js 服务模拟排队确认、场次调度、查询快照及资金事务。下文描述正式系统设计。
 
+## 构建正式 Java 后端
+
+在 JDK 25 环境下进入 `backend`，使用项目自带的 Maven Wrapper 构建。Windows PowerShell 命令如下。
+
+```powershell
+cd backend
+.\mvnw.cmd clean verify
+java -jar target/auction-backend-0.1.0-SNAPSHOT.jar --spring.profiles.active=skeleton
+```
+
+macOS 或 Linux 可用 `sh mvnw clean verify`。首次构建需要访问 Maven Central。应用默认监听 8080，`skeleton` 配置用于本地验证框架启动。Spring Security 的默认策略保护 HTTP 入口；业务 API 仍由上方的 Node.js Demo 提供。连接正式 MySQL 时使用默认配置，通过 `SPRING_DATASOURCE_URL`、`SPRING_DATASOURCE_USERNAME` 和 `SPRING_DATASOURCE_PASSWORD` 提供连接信息。
+
+Java 源码位于 [com.auction](backend/src/main/java/com/auction/)。HTTP 入口集中在 `trigger/http`，Kafka 入口在同级的 `consumer` 包。报名模块展示 Service、Repository 接口和基础设施实现的目录结构。框架与驱动版本见 [Maven 工程](backend/pom.xml)。
+
 ## 一场竞拍如何进行
 
 1. **报名**。系统按起拍价冻结竞拍者钱包中的可用余额，报名记录保存本场实际冻结的金额。一个用户可同时参与多场。
-2. **出价**。NGINX 将请求分发到业务实例。同一场次的资格、价格、截止时间和待发报价事件位于 Redis Cluster 的同一哈希槽。一段 Lua 脚本完成校验、更新榜单并写入待发事件，随后向出价者返回“已接收”。
-3. **反馈**。报价异步进入 Kafka。个人确认与报价落库由两个消费组独立推进，用户看到“已确认”时，数据库写入可能仍在进行。WebSocket 推送场次变化和个人报价状态。
+2. **出价**。NGINX 将请求分发到业务实例。同一场次的资格、价格、截止时间和待发报价事件位于 Redis Cluster 的同一哈希槽。一段 Lua 脚本完成校验、更新榜单并写入待发事件，随后向出价者返回“报价已通过”。
+3. **反馈**。报价异步进入 Kafka。落库组在 MySQL 报价明细事务提交后将个人回执更新为“报价已记录”。WebSocket 推送场次变化和个人报价状态。
 4. **加时与关场**。最后 10 秒内的有效报价将当时的截止时间延长 30 秒，每场最多加时 5 次。首笔等于起拍价也适用。关场时重新核对本场最新截止时间。
 5. **结算**。有中拍者时，正式结果驱动同场唯一订单。未中拍者解冻押金，中拍者正常成交时以冻结押金抵扣成交价并支付尾款。钱包、押金状态和流水按数据库事务处理。
 

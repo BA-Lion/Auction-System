@@ -20,6 +20,6 @@
 
 已讨论的索引方向：普通索引 (round_id, bid_version)、(round_id, user_id, accepted_at, bid_id)。bid_version 暂不设唯一约束，以 bid_id 去重，重投应核对原内容。
 
-不重复存 item_id，不添加是否中拍字段，不将 RECEIVED／CONFIRMED 个人回执状态作为本表字段。是否正式胜出由场次结果表达。
+不重复存 item_id，不添加是否中拍字段，不将 ACCEPTED／RECORDED 个人回执状态作为本表字段。是否正式胜出由场次结果表达。
 
 accepted_at 与 created_at 不同，消费延迟不会改变报价的原裁决时间；具体时间类型与精度待物理设计。

@@ -45,6 +45,8 @@
 
 ## 报名、出价与个人回执
 
+**正式后端契约修订。** 即时报价回执使用 `ACCEPTED`（报价已通过），MySQL 报价明细事务提交后使用 `RECORDED`（报价已记录）。正式接口、个人查询和推送统一使用这两个值及 `PENDING_REVIEW`。个人报价按收录进度展示，榜单按场次快照排序。本文件下方示例与合并规则中的 `RECEIVED`、`CONFIRMED` 是已交付模拟 Demo 的旧协议；旧 `CONFIRMED` 不能作为正式落库证据。
+
 | 操作 | 请求 | 结果 |
 | --- | --- | --- |
 | GET /rounds/{id}/my-registration | 无 | 200 `{registration: Registration \| null}`。Registration 含 registration_id、round_id、deposit_amount、deposit_status。 |

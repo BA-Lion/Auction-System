@@ -1,0 +1,7 @@
+# 仅用于无外部数据库时验证工程启动。
+spring:
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.jdbc.autoconfigure.DataSourceAutoConfiguration
+  flyway:
+    enabled: false
